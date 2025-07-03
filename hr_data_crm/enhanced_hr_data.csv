@@ -1,0 +1,68 @@
+"Objective : Analyzing employee compensation, retention and internal mobility.",,,,
+Turnover Rate by Department.,,,,
+Department,Total Employees,Employees Left,Turnover Rate(%),
+hr,739,215,29.09336942,
+management,630,91,14.44444444,
+RandD,787,121,15.37484117,
+IT,1227,273,22.24938875,
+accounting,767,204,26.59713168,
+marketing,858,203,23.65967366,
+product_mng,902,198,21.95121951,
+support,2229,555,24.89905787,
+technical,2720,697,25.625,
+sales,4140,1014,24.49275362,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+Promotion Rate by Job level,,,,
+Job Level,Total Employees,Promoted,Promotion Rate (%),
+Entry,224,6,2.678571429,
+Mid,13171,277,2.103105307,
+Senior,1604,36,2.244389027,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+,,,,
+Average Salary by Department and Gender,,,,
+Average of exact_salary,Column Labels,,,
+Row Labels,Female,Male,(blank),Grand Total
+accounting,57078,56415,,56688
+hr,55633,56398,,56078
+IT,54515,55586,,55105
+management,63988,65010,,64546
+marketing,55601,56000,,55833
+product_mng,55846,54786,,55274
+RandD,54769,56088,,55496
+sales,54412,55319,,54922
+support,54728,55018,,54887
+technical,55842,55118,,55444
+(blank),,,,
+Grand Total,55502,55824,,55681

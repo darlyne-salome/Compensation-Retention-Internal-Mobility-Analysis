@@ -1,0 +1,248 @@
+# Objective
+Analyze employee compensation, retention and internal mobility.
+
+# Data Source 
+From: Kaggle
+Originally saved as 'hr_data.csv'
+
+# Columns
+The data lacked some essential columns that i would need to analyze based on my objectives and hence i used Python to add new columns and distribute the data based on certain specifications as you will see in 'hr_data_columns.py'
+The enhanced copy was saved as 'enhanced_hr_data.csv'
+
+# New database
+Table name is 'Employees'
+
+# Extracting data
+SELECT *
+FROM Employees
+
+-Columns available: satisafaction_level, last_evaluation, number_projects, average-monthly_hours, time_spend_company, Work_accident, left, promotion_last_5years, Department, salary, job_level, exact_salary, gender, age.
+
+# Compensation (SQL Query and Analysis)
+
+-Average salary by department and job level.
+
+SELECT Department, job_level,ROUND(AVG(exact_salary),1) AS avg_salary
+FROM Employees
+GROUP BY Department, job_level
+
+The analysis shows clear salary differences across departments and job levels. As expected, average salary generally increases with job level, reflecting the organizational pay structure. However, some departments, such as Management, has a notably higher average salaries at equivalent job levels compared to others like IT or Product Management.
+
+This may indicate:
+
+Market-driven pay differences (e.g., based on external market value of the leaders).
+
+Possible internal pay equity issues.
+
+Strategic investment in certain departments over others.
+
+For example, at entry level:
+
+IT averages $39,586.7
+
+Management averages $52,860.1
+
+Such disparities may impact morale, retention, or perception of fairness across teams.
+
+-Salary distribution by gender.
+
+SELECT gender, salary, COUNT(*) AS count
+FROM Employees
+GROUP BY gender, salary;
+
+The analysis shows that men outnumber women across all pay tiers; low, medium, and high. This suggests that gender imbalances persist regardless of compensation level, which may point to broader issues in hiring, promotion, or retention practices.
+
+This warrants the need to check the pay gap across job levels based on gender.
+ 
+-Pay gaps across all job levels.
+
+SELECT job_level, gender, ROUND(AVG(exact_salary),1) AS avg_salary
+FROM Employees
+GROUP BY job_level, gender;
+
+The analysis shows that across all job levels, male employees earn higher average salaries than their female counterparts. This pattern holds consistently, even at equivalent roles and seniority. Such a finding raises potential concerns around pay equity and fairness in compensation practices.
+
+For example:
+
+At Entry Level, women earn an average of $41,541.4 while men earn $41,870.8
+
+At Senior Level, the gap widens: women earn $67,263.2, men $68,426.8.
+
+-Pay Gaps across departments.
+
+SELECT Department, gender, ROUND(AVG(Exact_salary),1) AS avg_salary
+FROM Employees
+GROUP BY Department, gender
+
+The analysis of average salaries by gender and department reveals a mixed pattern:
+
+In the Accounting department, female employees earn more than their male counterparts, indicating a possible strong representation of women in higher-paying accounting roles or leadership positions within that function.
+
+Similarly, in the Technical department, female employees also out-earn male employees, which may reflect a focus on gender-inclusive hiring and advancement in specialized roles.
+
+However, in all other departments, male employees earn more on average than female employees, suggesting that gender-based pay disparities may persist in the broader organization.
+
+-High earners vs Low Earners by age.
+
+SELECT 
+  CASE 
+    WHEN age < 30 THEN 'Under 30'
+    WHEN age BETWEEN 30 AND 40 THEN '30–40'
+    ELSE 'Over 40' 
+  END AS age_group,
+  salary,
+  COUNT(*) AS count
+FROM Employees
+GROUP BY age_group, salary;
+
+The salary distribution across age groups reveals that the majority of employees, regardless of age, earn low salaries. As salary levels increase within each age group, the number of employees decreases, indicating that high-paying roles are limited across all age brackets. 
+
+This suggests a narrow salary structure, with few employees accessing high compensation, regardless of age or experience. It may also indicate limited upward mobility.
+
+# Retention (SQL Query and Analysis)
+
+-Data cleaning
+Noticed that i had a misspelling on one of the column names, hence renamed it using the query below:
+
+ALTER TABLE Employees
+RENAME COLUMN average_montly_hours TO average_monthly_hours;
+
+- Factors that correlate with employees leaving.
+
+SELECT 
+  ROUND(AVG(satisfaction_level), 1) AS avg_satisfaction,
+  ROUND(AVG(last_evaluation), 0) AS avg_evaluation,
+  ROUND(AVG(number_project), 0) AS avg_projects,
+  ROUND(AVG(average_monthly_hours), 0) AS avg_hours,
+  ROUND(AVG(time_spend_company), 0) AS avg_tenure,
+  ROUND(AVG(Work_accident), 0) AS accident_rate,
+  ROUND(AVG(promotion_last_5years), 0) AS promo_rate
+FROM Employees
+WHERE left = 1;
+
+The analysis of employees who exited the organization highlights several underlying factors:
+
+1. Low satisfaction levels: With an average score of 0.4, these employees were not completely disengaged, but they were still significantly below ideal satisfaction levels — pointing to unmet expectations, poor morale, or work culture challenges.
+
+2. Poor evaluation scores: A score of 1 suggests underperformance or possibly a lack of coaching, development, or clear goals, which can lead to disengagement.
+
+3. Moderate project load and high work hours: Averaging 4 projects and 207 hours per month, these employees may have experienced workload stress without feeling rewarded or supported.
+
+4. Lack of progression: Despite spending an average of 4 years at the company, none of these employees were promoted. This suggests a career stagnation issue, which is a common driver of voluntary exits.
+
+5. No accidents were reported, so physical safety is likely not a contributing factor.
+
+- Turn over by Department
+
+SELECT Department, 
+       COUNT(*) AS total_employees,
+       ROUND(SUM(CASE WHEN left = 1 THEN 1 ELSE 0 END) * 100.0/ COUNT(*),0) AS turnover_rate
+FROM Employees
+GROUP BY Department;
+
+The analysis of turnover rates by department reveals that HR has the highest turnover at 29%, indicating a potential issue with retention in the very function responsible for managing people and culture.
+
+On the other end of the spectrum, Management has the lowest turnover rate at 14%, closely followed by RandD at 15%, suggesting these departments may offer more stability, career growth, or job satisfaction.
+
+These findings highlight the need to further investigate the drivers of attrition in HR such as burnout, limited mobility or workload imbalance and apply lessons from departments with stronger retention across other departments based on their needs.
+
+-Retention by job level
+
+SELECT job_level,
+       COUNT(*) AS total,
+       SUM(CASE WHEN left = 0 THEN 1 ELSE 0 END) AS retained,
+       ROUND(SUM(CASE WHEN left = 0 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 0) AS retention_rate
+FROM Employees
+GROUP BY job_level;
+
+The analysis shows that retention is highest at entry level (97%), indicating strong onboarding and early employee support. It drops to 80% at mid-level, suggesting growing disengagement or unmet expectations. Senior-level retention is lowest at 42%, revealing a critical risk in leadership continuity, likely due to burnout, lack of advancement, or role pressure. 
+
+# Mobility (SQL Query and Analysis)
+
+-Promotion by Department
+
+SELECT Department,
+       COUNT (*)AS total_employees,
+       SUM(CASE WHEN promotion_last_5years = 1 THEN 1 ELSE 0 END) AS total_promoted,   
+       ROUND(AVG(promotion_last_5years) * 100, 1) AS promotion_rate
+FROM Employees
+GROUP BY Department;
+
+The analysis shows that Management has the highest promotion rate, indicating strong upward mobility within leadership roles. In contrast, Product Management shows a 0% promotion rate, suggesting limited or no advancement opportunities in that department over the last 5 years.
+
+-Average time spent at the company before promotion
+
+SELECT ROUND(AVG(time_spend_company),1) AS avg_tenure_before_promo
+FROM Employees
+WHERE promotion_last_5years = 1;
+
+On average, employees take 4.2 years to receive a promotion. This suggests that career advancement is relatively slow, which may contribute to lower engagement or increased turnover at mid and senior levels.
+
+-Correlation between promotion and retention 
+
+SELECT promotion_last_5years, 
+       COUNT(*) AS total_employees,
+       SUM(CASE WHEN left = 1 THEN 1 ELSE 0 END) AS total_changes,
+       ROUND(AVG(CASE WHEN left = 1 THEN 1 ELSE 0 END) * 100.0,0 ) AS turnover_rate
+FROM Employees
+GROUP BY promotion_last_5years;
+
+An observation from the analysis shows that out of 14,680 employees who were not promoted, 3,552 left the organization (a turnover rate of 24%). It also shows that among the 319 employees who received a promotion, only 19 left, resulting in a turnover rate of just 0.3%.
+This contrast highlights the strong link between promotion and retention: employees who are promoted are significantly more likely to stay, while lack of advancement correlates with higher attrition.
+
+-Promotion frequency by job level
+
+SELECT job_level, 
+       ROUND(AVG(promotion_last_5years) * 100, 2) AS promo_rate
+FROM Employees
+GROUP BY job_level;
+
+Promotion opportunities appear limited across all levels:
+
+Entry-level: 2.68%
+
+Mid-level: 2.10%
+
+Senior-level: 2.24%
+
+The rates are low across the board, with mid-level employees receiving the fewest promotions, which may explain the earlier finding of higher attrition at this level.
+
+# Visuals (Excel)
+
+File is saved as 'enhanced_hr_data'
+
+-Turnover Rate by Department
+
+COUNTIF function used to get total employees per department.
+COUNTIFS function used to get total employees that left per department as it allows for multiple criteria selection.
+Turnover rate was gotten using division of cells and then multiplication by 100% and then the rest of the cells were auto-filled. 
+Conditional formatting is used for quick interpretation of results.
+Data is represented in form of a bar chart for easier interpretation and storytelling.
+
+-Promotion Rate by Job Level
+
+COUNTIF function was used to get total employees per job level.
+COUNTIFS function was used to get the number of employees promoted per job level.
+Promotion Rate was gotten using division of cells and then multiplying by 100% and the rest of the cells were auto-filled.
+Conditional formatting is used for quick interpretation of results.
+Data is represented in form of a column chart for easier interpretation and storytelling.
+
+-Average Salary by Department and Gender
+
+Copied Exact salary, gender, and department columns to sheet 2.
+Made a pivot table and chart on the visuals sheet.
+
+
+Analysis by: Darlyne Salome  
+
+
+
+
+
+
+
+
+
+
+
+
